@@ -1,7 +1,12 @@
 // eslint.config.cjs
+
+const tsParser = require("@typescript-eslint/parser");
+const tsPlugin = require("@typescript-eslint/eslint-plugin");
+
 /** @type {import("eslint").Linter.FlatConfig[]} */
 module.exports = [
   {
+    // Carpeta a ignorar
     ignores: ["dist/**", "build/**"],
   },
   {
@@ -9,13 +14,14 @@ module.exports = [
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: "module",
-      parser: require.resolve("@typescript-eslint/parser"),
+      // 👇 aquí va el objeto del parser, NO la ruta
+      parser: tsParser,
     },
     plugins: {
-      "@typescript-eslint": require("@typescript-eslint/eslint-plugin"),
+      "@typescript-eslint": tsPlugin,
     },
     rules: {
-      // Reglas básicas, puedes ajustar luego
+      // Reglas básicas; puedes afinarlas luego
       "no-undef": "error",
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
     },
