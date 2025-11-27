@@ -28,7 +28,6 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -52,6 +51,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - name: Install dependencies (prod)
         run: npm ci --production
@@ -61,15 +61,14 @@ jobs:
 
       - name: Create deployment package
         run: |
-          # Asumiendo que tu código compilado queda en dist/
-          # Empaquetamos dist + node_modules en lambda.zip en la raíz del repo
-          zip -r lambda.zip dist node_modules
+          mkdir -p build
+          zip -r build/stats-lambda.zip dist node_modules
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: lambda-package
-          path: lambda.zip
+          path: build/stats-lambda.zip
 
   deploy:
     name: Deploy to AWS
@@ -84,7 +83,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: lambda-package
-          path: .
+          path: build
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -104,7 +103,7 @@ jobs:
         working-directory: terraform
         run: |
           terraform plan \
-            -var="lambda_zip_path=../lambda.zip" \
+            -var="lambda_zip_path=../build/stats-lambda.zip" \
             -var="dynamodb_table_name=${{ secrets.DYNAMODB_TABLE_NAME }}" \
             -var="dynamodb_table_arn=${{ secrets.DYNAMODB_TABLE_ARN }}" \
             -var="api_gateway_id=${{ secrets.API_GATEWAY_ID }}" \
@@ -114,7 +113,7 @@ jobs:
         working-directory: terraform
         run: |
           terraform apply -auto-approve \
-            -var="lambda_zip_path=../lambda.zip" \
+            -var="lambda_zip_path=../build/stats-lambda.zip" \
             -var="dynamodb_table_name=${{ secrets.DYNAMODB_TABLE_NAME }}" \
             -var="dynamodb_table_arn=${{ secrets.DYNAMODB_TABLE_ARN }}" \
             -var="api_gateway_id=${{ secrets.API_GATEWAY_ID }}" \
