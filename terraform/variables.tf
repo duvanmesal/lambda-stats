@@ -15,3 +15,28 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+variable "lambda_zip_path" {
+  type = string
+  description = "Path to the Lambda ZIP file"
+}
+
+variable "dynamodb_table_name" {
+  type = string
+  description = "Name of the DynamoDB table"
+}
+
+variable "dynamodb_table_arn" {
+  type = string
+  description = "ARN of the DynamoDB table"
+}
+
+variable "api_gateway_id" {
+  type = string
+  description = "API Gateway ID"
+}
+
+variable "api_gateway_execution_arn" {
+  type = string
+  description = "API Gateway execution ARN"
+}
