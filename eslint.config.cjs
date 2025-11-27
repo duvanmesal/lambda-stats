@@ -6,7 +6,7 @@ const tsPlugin = require("@typescript-eslint/eslint-plugin");
 /** @type {import("eslint").Linter.FlatConfig[]} */
 module.exports = [
   {
-    // Carpeta a ignorar
+    // Carpetas a ignorar
     ignores: ["dist/**", "build/**"],
   },
   {
@@ -14,16 +14,24 @@ module.exports = [
     languageOptions: {
       ecmaVersion: 2020,
       sourceType: "module",
-      // 👇 aquí va el objeto del parser, NO la ruta
       parser: tsParser,
+      // 👇 aquí declaramos los globals de Node / Lambda
+      globals: {
+        console: "readonly",
+        process: "readonly",
+        URL: "readonly",
+      },
     },
     plugins: {
       "@typescript-eslint": tsPlugin,
     },
     rules: {
-      // Reglas básicas; puedes afinarlas luego
+      // Puedes dejarla activada, ya no se quejará de console/process/URL
       "no-undef": "error",
-      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_" },
+      ],
     },
   },
 ];
