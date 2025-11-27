@@ -3,10 +3,11 @@ name: Deploy Module 3 - URL Stats Lambda
 on:
   push:
     branches:
+      - master
       - main
       - develop
     paths:
-      - 'lambda-modules/module-3-stats/**'
+      - '**'
   workflow_dispatch:
 
 env:
@@ -27,18 +28,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: lambda-modules/module-3-stats/package-lock.json
+          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
-        working-directory: lambda-modules/module-3-stats
         run: npm ci
 
       - name: Run linting
-        working-directory: lambda-modules/module-3-stats
         run: npm run lint
 
       - name: Run tests
-        working-directory: lambda-modules/module-3-stats
         run: npm test
 
   build:
@@ -55,27 +53,23 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install dependencies
-        working-directory: lambda-modules/module-3-stats
+      - name: Install dependencies (prod)
         run: npm ci --production
 
       - name: Build TypeScript
-        working-directory: lambda-modules/module-3-stats
         run: npm run build
 
       - name: Create deployment package
-        working-directory: lambda-modules/module-3-stats
         run: |
-          cd dist
-          zip -r ../lambda.zip .
-          cd ..
-          zip -r lambda.zip node_modules
+          # Asumiendo que tu código compilado queda en dist/
+          # Empaquetamos dist + node_modules en lambda.zip en la raíz del repo
+          zip -r lambda.zip dist node_modules
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: lambda-package
-          path: lambda-modules/module-3-stats/lambda.zip
+          path: lambda.zip
 
   deploy:
     name: Deploy to AWS
@@ -90,7 +84,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: lambda-package
-          path: lambda-modules/module-3-stats
+          path: .
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -103,11 +97,11 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
-        working-directory: lambda-modules/module-3-stats/terraform
+        working-directory: terraform
         run: terraform init
 
       - name: Terraform Plan
-        working-directory: lambda-modules/module-3-stats/terraform
+        working-directory: terraform
         run: |
           terraform plan \
             -var="lambda_zip_path=../lambda.zip" \
@@ -117,7 +111,7 @@ jobs:
             -var="api_gateway_execution_arn=${{ secrets.API_GATEWAY_EXECUTION_ARN }}"
 
       - name: Terraform Apply
-        working-directory: lambda-modules/module-3-stats/terraform
+        working-directory: terraform
         run: |
           terraform apply -auto-approve \
             -var="lambda_zip_path=../lambda.zip" \
@@ -127,5 +121,5 @@ jobs:
             -var="api_gateway_execution_arn=${{ secrets.API_GATEWAY_EXECUTION_ARN }}"
 
       - name: Output deployment info
-        working-directory: lambda-modules/module-3-stats/terraform
+        working-directory: terraform
         run: terraform output
