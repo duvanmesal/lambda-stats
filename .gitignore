@@ -1,0 +1,77 @@
+# --- Node / TypeScript ---
+node_modules/
+dist/
+build/
+lib/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+*.log.*
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# --- Prisma ---
+prisma/*.db
+prisma/migrations/*/migration.sql
+prisma/migrations/*/steps.json
+prisma/.env
+*.db-journal
+
+# --- Terraform ---
+# Terraform state
+*.tfstate
+*.tfstate.*
+terraform.tfstate
+terraform.tfstate.*
+
+# Crash logs
+crash.log
+
+# Plan files
+*.tfplan
+
+# Local terraform directories
+.terraform/
+.terraform.lock.hcl
+
+# Variable files (sensitive)
+terraform.tfvars
+terraform.tfvars.json
+
+# --- AWS ---
+# Lambda zip artifacts
+*.zip
+
+# SAM / CDK outputs
+.aws-sam/
+cdk.out/
+
+# --- Docker ---
+docker-data/
+*.tar
+
+# --- Misc ---
+tmp/
+temp/
+.cache/
