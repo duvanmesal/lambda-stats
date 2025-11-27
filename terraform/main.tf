@@ -22,7 +22,7 @@ locals {
 }
 
 resource "aws_iam_role" "lambda_role" {
-  name = "${var.project_name}-stats-lambda-role-${var.environment}"
+  name_prefix = "${var.project_name}-stats-lambda-role-${var.environment}-"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
