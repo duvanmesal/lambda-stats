@@ -68,7 +68,6 @@ jobs:
           name: lambda-package
           path: build/stats-lambda.zip
 
-
   deploy:
     name: Deploy to AWS
     runs-on: ubuntu-latest
@@ -97,6 +96,21 @@ jobs:
       - name: Terraform Init
         working-directory: terraform
         run: terraform init
+
+      # 👇 NUEVO: importar la Lambda existente si ya está creada en AWS
+      - name: Import existing Lambda (if present)
+        working-directory: terraform
+        run: |
+          set +e
+          echo "Checking if Lambda url-shortener-stats-dev exists in AWS..."
+          aws lambda get-function --function-name url-shortener-stats-dev >/dev/null 2>&1
+          if [ $? -eq 0 ]; then
+            echo "Lambda exists, importing into Terraform state..."
+            terraform import aws_lambda_function.stats_lambda url-shortener-stats-dev || echo "Import failed (maybe already imported), continuing..."
+          else
+            echo "Lambda does not exist in AWS, skipping import."
+          fi
+          set -e
 
       - name: Terraform Plan
         working-directory: terraform
